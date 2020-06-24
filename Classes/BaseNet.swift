@@ -1,9 +1,9 @@
 import Foundation
 import Alamofire
 
-class BaseNet: NSObject {
+open class BaseNet: NSObject {
     ///图片上传处理
-    open func picRequest(urlStr : String, params:[String: String]?, images: [UIImage], name: [String], beginDeal: @escaping ()->(), endDeal: @escaping ()->(), success : @escaping (_ response : [String : Any])->(), failture : @escaping (_ error : Error?)->()) {
+    public func picRequest(urlStr : String, params:[String: String]?, images: [UIImage], name: [String], beginDeal: @escaping ()->(), endDeal: @escaping ()->(), success : @escaping (_ response : [String : Any])->(), failture : @escaping (_ error : Error?)->()) {
         if proxyStatus() {return}
         let header = ["content-type":"multipart/form-data"]
         beginDeal()
@@ -37,7 +37,7 @@ class BaseNet: NSObject {
         })
     }
     ///一般接口处理
-    open func netRequest(urlStr: String, method: HTTPMethod, params: [String : Any]?, beginDeal: @escaping ()->(), endDeal: @escaping ()->(), tokenInvalid: @escaping ()->(), success: @escaping (_ response : [String : Any])->(), failture: @escaping (_ error : Error?)->()) {
+    public func netRequest(urlStr: String, method: HTTPMethod, params: [String : Any]?, beginDeal: @escaping ()->(), endDeal: @escaping ()->(), tokenInvalid: @escaping ()->(), success: @escaping (_ response : [String : Any])->(), failture: @escaping (_ error : Error?)->()) {
         if proxyStatus() {return}
         let header: HTTPHeaders = [
             "Authorization": "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==",
