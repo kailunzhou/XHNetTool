@@ -2,6 +2,39 @@ import Foundation
 import Alamofire
 
 open class BaseNet: NSObject {
+    ///一般接口处理
+    public func netRequest(urlStr: String, method: HTTPMethod, params: [String : Any]?, beginDeal: @escaping ()->(), endDeal: @escaping ()->(), success: @escaping (_ response : [String : Any])->(), failture: @escaping (_ error : Error?)->()) {
+        if proxyStatus() {return}
+        let header: HTTPHeaders = [
+            "Authorization": "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==",
+            "Accept": "application/json"
+        ]
+        var param: [String: Any] = [:]
+        if let paramss = params {
+            param = paramss
+        }
+        param["userId"] = "11111111111"
+        param["sign"] = "AGFSDFRTGF56GTS"
+        param["timeStamp"] = getTimeStamp()
+        beginDeal()
+        Alamofire.request(urlStr, method: method, parameters: param, encoding: JSONEncoding.default, headers: header).responseJSON { (response) in
+            endDeal()
+            switch response.result {
+            case .success:
+                guard let successDic = response.result.value as? [String: Any] else {
+                    failture(nil)
+                    return
+                }
+                let jsonStr = successDic.showJsonString
+                #if DEBUG
+                print("\n请求链接:\(urlStr)\n请求参数:\(param)\n请求结果:\(jsonStr)")
+                #endif
+                success(successDic)
+            case .failure(let error):
+                failture(error)
+            }
+        }
+    }
     ///图片上传处理
     public func picRequest(urlStr : String, params:[String: String]?, images: [UIImage], name: [String], beginDeal: @escaping ()->(), endDeal: @escaping ()->(), success : @escaping (_ response : [String : Any])->(), failture : @escaping (_ error : Error?)->()) {
         if proxyStatus() {return}
@@ -28,41 +61,15 @@ open class BaseNet: NSObject {
                         return
                     }
                     let jsonStr = successDic.showJsonString
+                    #if DEBUG
                     print("\n请求链接:\(urlStr)\n请求参数:\(params ?? [:])\n请求结果:\(jsonStr)")
+                    #endif
                     success(successDic)
                 }
             case .failure(let error):
                 failture(error)
             }
         })
-    }
-    ///一般接口处理
-    public func netRequest(urlStr: String, method: HTTPMethod, params: [String : Any]?, beginDeal: @escaping ()->(), endDeal: @escaping ()->(), tokenInvalid: @escaping ()->(), success: @escaping (_ response : [String : Any])->(), failture: @escaping (_ error : Error?)->()) {
-        if proxyStatus() {return}
-        let header: HTTPHeaders = [
-            "Authorization": "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==",
-            "Accept": "application/json"
-        ]
-        beginDeal()
-        Alamofire.request(urlStr, method: method, parameters: params, encoding: JSONEncoding.default, headers: header).responseJSON { (response) in
-            endDeal()
-            switch response.result {
-            case .success:
-                guard let successDic = response.result.value as? [String: Any] else {
-                    failture(nil)
-                    return
-                }
-                let jsonStr = successDic.showJsonString
-                print("\n请求链接:\(urlStr)\n请求参数:\(params ?? [:])\n请求结果:\(jsonStr)")
-                if let code = successDic["code"] as? Int, code == -100 {
-                    tokenInvalid()
-                } else {
-                    success(successDic)
-                }
-            case .failure(let error):
-                failture(error)
-            }
-        }
     }
     ///获取时间戳
     fileprivate func getTimeStamp() -> String {
