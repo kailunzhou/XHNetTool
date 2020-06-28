@@ -7,8 +7,9 @@ open class BaseNet: NSObject {
     
     public var tokenInvalid: (()->())?//token失效方法
     public var token: String?//token值
+    public var service: String? //服务器地址
     /*
-     urlStr: 接口地址
+     urlStr: 接口地址拼接部分
      data: 传入参数
      view: 当前的视图
      isParse: 返回的数据是否要先解析
@@ -46,7 +47,7 @@ open class BaseNet: NSObject {
         }
     }
     /*
-     urlStr: 接口地址
+     urlStr: 接口地址拼接部分
      data: 传入参数
      images: 上传的图片
      view: 当前的视图
@@ -80,19 +81,19 @@ open class BaseNet: NSObject {
      */
     ///一般接口处理
     public func netRequest(urlStr: String, method: HTTPMethod, data: [String : Any]?, beginDeal: @escaping ()->(), endDeal: @escaping ()->(), success: @escaping (_ response : [String : Any])->(), failture: @escaping (_ error : Error?)->()) {
+        guard let tokens = token, let services = service else {return}
         if proxyStatus() {return}
         let header: HTTPHeaders = [
             "Authorization": "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==",
             "Accept": "application/json"
         ]
-        guard let tokens = token else {return}
         var param: [String: Any] = ["userId": "11111111111", "sign": "AGFSDFRTGF56GTS",
                                     "timeStamp": getTimeStamp(), "token": tokens]
         if let datas = data {
             param["data"] = datas
         }
         beginDeal()
-        Alamofire.request(urlStr, method: method, parameters: param, encoding: JSONEncoding.default, headers: header).responseJSON { (response) in
+        Alamofire.request(services + urlStr, method: method, parameters: param, encoding: JSONEncoding.default, headers: header).responseJSON { (response) in
             endDeal()
             switch response.result {
             case .success:
@@ -112,6 +113,7 @@ open class BaseNet: NSObject {
     }
     ///图片上传处理
     public func picRequest(urlStr : String, params:[String: String]?, images: [UIImage], name: [String], beginDeal: @escaping ()->(), endDeal: @escaping ()->(), success : @escaping (_ response : [String : Any])->(), failture : @escaping (_ error : Error?)->()) {
+        guard let services = service else {return}
         if proxyStatus() {return}
         let header = ["content-type":"multipart/form-data"]
         beginDeal()
@@ -126,7 +128,7 @@ open class BaseNet: NSObject {
                 }
                 multipartFormData.append(images[index].jpegData(compressionQuality: 0.3)!, withName: "file", fileName: "file\(arc).png", mimeType: "image/png")
             }
-        }, to: urlStr, headers: header, encodingCompletion: { (encodingResult) in
+        }, to: services + urlStr, headers: header, encodingCompletion: { (encodingResult) in
             endDeal()
             switch encodingResult {
             case .success(let upload, _, _):
@@ -170,7 +172,7 @@ open class BaseNet: NSObject {
     }
 }
 
-extension Dictionary where Key: ExpressibleByStringLiteral, Value: Any {
+public extension Dictionary where Key: ExpressibleByStringLiteral, Value: Any {
     var showJsonString: String {
         do {
             var dic: [String: Any] = [String: Any]()
