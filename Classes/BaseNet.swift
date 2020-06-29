@@ -126,7 +126,7 @@ open class BaseNet: NSObject {
      */
     ///一般接口处理
     public func netRequest(urlStr: String, method: HTTPMethod, param: [String : Any]?, beginDeal: @escaping ()->(), endDeal: @escaping ()->(), success: @escaping (_ response : [String : Any])->(), failture: @escaping (_ error : Error?)->()) {
-        guard let tokens = token, let services = service else {return}
+        guard let services = service else {return}
         if proxyStatus() {return}
         let header: HTTPHeaders = [
             "Authorization": "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==",
