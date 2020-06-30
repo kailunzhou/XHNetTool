@@ -99,7 +99,7 @@ open class BaseNet: NSObject {
      okAction: 解析完成调用的事件
     */
     public func BaseNetPicRequest(_ urlStr: String, _ data: [String: String]?, _ images: [UIImage], _ view: UIView?, okAction: @escaping (_ fileUrl: String?)->()) {
-        BaseNet().picRequest(urlStr: urlStr, params: data, images: images, name: [], beginDeal: {
+        picRequest(urlStr: urlStr, params: data, images: images, name: [], beginDeal: {
             MBProgressHUD.showLoading(view, with: nil)
         }, endDeal: {
             MBProgressHUD.dismisHUD(view)
