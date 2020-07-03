@@ -151,7 +151,7 @@ open class BaseNet: NSObject {
                 }
                 let jsonStr = successDic.showJsonString
                 #if DEBUG
-                print("\n请求链接:\(urlStr)\n请求参数:\(paramDic)\n请求结果:\(jsonStr)")
+                print("\n请求链接:\(services + urlStr)\n请求参数:\(paramDic)\n请求结果:\(jsonStr)")
                 #endif
                 success(successDic)
             case .failure(let error):
@@ -187,7 +187,7 @@ open class BaseNet: NSObject {
                     }
                     let jsonStr = successDic.showJsonString
                     #if DEBUG
-                    print("\n请求链接:\(urlStr)\n请求参数:\(params ?? [:])\n请求结果:\(jsonStr)")
+                    print("\n请求链接:\(services + urlStr)\n请求参数:\(params ?? [:])\n请求结果:\(jsonStr)")
                     #endif
                     success(successDic)
                 }
@@ -239,5 +239,3 @@ public extension Dictionary where Key: ExpressibleByStringLiteral, Value: Any {
         }
     }
 }
-
-
