@@ -1,5 +1,6 @@
 import Foundation
 import Alamofire
+import ZCommonTool
 import MBProgressHUD
 
 open class BaseNet: NSObject {
@@ -127,7 +128,7 @@ open class BaseNet: NSObject {
     ///一般接口处理
     public func netRequest(urlStr: String, method: HTTPMethod, param: [String : Any]?, beginDeal: @escaping ()->(), endDeal: @escaping ()->(), success: @escaping (_ response : [String : Any])->(), failture: @escaping (_ error : Error?)->()) {
         guard let services = service else {return}
-        if proxyStatus() {return}
+        if CTProxyStatus() {return}
         let header: HTTPHeaders = [
             "Authorization": "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==",
             "Accept": "application/json"
@@ -162,7 +163,7 @@ open class BaseNet: NSObject {
     ///图片上传处理
     public func picRequest(urlStr : String, params:[String: String]?, images: [UIImage], name: [String], beginDeal: @escaping ()->(), endDeal: @escaping ()->(), success : @escaping (_ response : [String : Any])->(), failture : @escaping (_ error : Error?)->()) {
         guard let services = service else {return}
-        if proxyStatus() {return}
+        if CTProxyStatus() {return}
         let header = ["content-type":"multipart/form-data"]
         beginDeal()
         Alamofire.upload(multipartFormData: { (multipartFormData) in
@@ -202,40 +203,5 @@ open class BaseNet: NSObject {
         formart.dateFormat = "yyyyMMddHHmmssSSS"
         let timeStamp = formart.string(from: Date())
         return timeStamp
-    }
-    ///判断是否代理
-    fileprivate func proxyStatus() -> Bool {
-        let dic = CFNetworkCopySystemProxySettings()!.takeUnretainedValue()
-        let arr = CFNetworkCopyProxiesForURL(URL(string: "https://www.baidu.com")! as CFURL, dic).takeUnretainedValue()
-        let obj = (arr as [AnyObject])[0]
-//        let host = obj.object(forKey: kCFProxyHostNameKey) ?? "null"
-//        let port = obj.object(forKey: kCFProxyPortNumberKey) ?? "null"
-//        let type = obj.object(forKey: kCFProxyTypeKey) ?? "null"
-//        delog("host = \(host)\nport = \(port)\ntype = \(type)")
-        if obj.object(forKey: kCFProxyTypeKey) == kCFProxyTypeNone {
-            return false//没有设置代理
-        }else {
-            return true//设置代理了
-        }
-    }
-}
-
-public extension Dictionary where Key: ExpressibleByStringLiteral, Value: Any {
-    var showJsonString: String {
-        do {
-            var dic: [String: Any] = [String: Any]()
-            for (key, value) in self {
-                dic["\(key)"] = value
-            }
-            let jsonData = try JSONSerialization.data(withJSONObject: dic, options: JSONSerialization.WritingOptions.prettyPrinted)
-
-            if let data = NSString(data: jsonData, encoding: String.Encoding.utf8.rawValue) as String? {
-                return data
-            } else {
-                return "{}"
-            }
-        } catch {
-            return "{}"
-        }
     }
 }

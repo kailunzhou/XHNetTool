@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name             = "XHNetTool"
-  spec.version          = "0.0.9"
+  spec.version          = "0.1.0"
   spec.license          = "MIT"
   
   spec.summary          = "XHNetTool summary"
@@ -9,11 +9,12 @@ Pod::Spec.new do |spec|
   spec.swift_version    = "4.2"
   spec.homepage         = "https://github.com/kailunzhou/XHNetTool"
   spec.author           = { "zklcode" => "372909335@qq.com" }
-  spec.source           = { :git => "https://github.com/kailunzhou/XHNetTool.git", :tag => "0.0.9" }
+  spec.source           = { :git => "https://github.com/kailunzhou/XHNetTool.git", :tag => "0.1.0" }
   
   spec.source_files     = "Classes", "Classes/**/*.{h,m,swift}"
   spec.dependency       "Alamofire"
   spec.dependency       "MBProgressHUD"
+  spec.dependency       "ZCommonTool"
   
   
   # spec.public_header_files = "Classes/**/*.h"
